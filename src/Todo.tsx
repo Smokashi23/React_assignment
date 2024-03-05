@@ -1,60 +1,61 @@
-import React, { useState } from 'react';
+import React, {useState } from 'react';
 import './Todo.css';
 
 interface TodoItem {
+  id:number;
   todo: string;
   completed: boolean;
 }
 
 const Todo = () => {
   const [todo, setTodo] = useState<string>('');
-  const [array, setArray] = useState<TodoItem[]>([]);
+  const [todolist, setTodolist] = useState<TodoItem[]>([]);
+  const[nextId,setID]=useState(0)
 
   const addTodo = () => {
     if (todo.trim() !== '') {
-      setArray([...array, { todo, completed: false }]);
+      setTodolist([...todolist, {id:nextId, todo, completed: false }]);
       setTodo('');
+      setID(nextId+1)
     } else {
       alert('Enter task');
     }
   };
-  const handleInput = (str: string) => {
-    setTodo(str);
+  function handleInput(event:any) {
+    setTodo(event.target.value);
+  }
+
+  const deleteTodo = (t:TodoItem) => {
+    const newtodo=todolist.filter((item)=>item.id!==t.id);
+    setTodolist(newtodo);
   };
 
-  const deleteTodo = (index: number) => {
-    const newArray = [...array];
-    newArray.splice(index, 1);
-    setArray(newArray);
+  const onCompletion = (t: TodoItem) => {
+    t.completed=!t.completed
+    setTodolist([...todolist])
   };
-
-  const Completion = (index: number) => {
-    const newArray = [...array];
-    newArray[index].completed = !newArray[index].completed;
-    setArray(newArray);
-  };
-
+   
   return (
     <div className="todo-container">
       <h1>Todo app</h1>
-      <input type="text" value={todo} onChange={(e) => handleInput(e.target.value)} />
+      <input type="text" value={todo} onChange={handleInput} />
       <button onClick={addTodo}> Add Todo</button>
       <div>
       <ul>
-        {array.map((item: TodoItem, index: number) => (
-          <li key={index}>
-            <input type="checkbox" checked={item.completed} onChange={() => Completion(index)} />
+        {todolist.map((item: TodoItem) => (
+          <li key={item.id}>
+            <input type="checkbox" checked={item.completed} onChange={() => onCompletion(item)} />
             {item.todo}
-            <button onClick={() => deleteTodo(index)}>Delete</button>
+            <button onClick={() => deleteTodo(item)}>Delete</button>
           </li>
         ))}
       </ul>
     <div>
       <h2>Completed Todos</h2>
       <ul>
-        {array.map((item: TodoItem, index: number) => (
+        {todolist.map((item: TodoItem) => (
           item.completed && (
-            <li key={index}>
+            <li key={item.id}>
               {item.todo}
             </li>
           )
@@ -63,17 +64,16 @@ const Todo = () => {
     </div>
     <h2>Uncompleted Todos</h2>
       <ul>
-        {array.map((item: TodoItem, index: number) => (
+        {todolist.map((item: TodoItem) => (
           !item.completed && (
-            <li key={index}>
+            <li key={item.id}>
               {item.todo}
             </li>
           )
         ))}
       </ul>
     </div>
-  </div>
-    
+  </div>   
   );
 };
 
