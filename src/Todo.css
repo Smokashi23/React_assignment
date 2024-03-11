@@ -1,23 +1,138 @@
+
 .todo-container {
+  list-style-type: none;
   text-align: center;
   margin: 0 auto;
-  max-width: 600px;
-}.todo-container {
-  text-align: center;
-  margin: 0 auto;
-  max-width: 600px; 
-  border: 2px solid #ccc; 
-  border-radius: 8px; 
-  padding: 20px; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  width: 100%;
 }
+
+.todoList {
+  display: flex;
+  flex-direction: column;
+}
+
+.todoList li {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  margin-bottom: 5px; 
+}
+
+.todoList li input[type="checkbox"] {
+  margin-right: 5px; 
+}
+
+.todoList li button.action-button {
+  margin-left: 5px; 
+}
+
+.viewList li{
+  list-style-type: none;
+
+}
+
+
+.com{
+ 
+  width: calc(50vw - 50px);
+  margin:20px;
+  border:1px solid grey;
+  min-height: 60vh;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px; 
+
+}
+
+.incom{
+  width: calc(50vw - 50px);
+  margin:20px;
+  border:1px solid grey;
+  min-height: 60vh;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px; 
+}
+
 .loading-message {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; 
+  height: 100vh;
 }
 
-.error-message {
-  color: red;
+.action-button {
+  background-color: #007bff; 
+  border: none; 
+  color: #ffffff; 
+  padding: 8px 16px;
+  margin-left: 10px;
+  cursor: pointer; 
+  text-decoration: none;
+  border-radius: 5px; 
 }
+
+.action-button:hover {
+  background-color: #0056b3; 
+}
+
+
+.viewList {
+  display: flex;
+ 
+}
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todo-list.completed {
+  margin-right: 20px; /* Adjust spacing between the lists */
+}
+
+.todo-list.incompleted {
+  margin-left: 20px; /* Adjust spacing between the lists */
+}
+
+.todo-item {
+  margin-bottom: 10px; /* Adjust spacing between todo items */
+}
+
+.todo-card {
+  border: 1px solid #ccc;
+  width:50%;
+  margin:auto;
+  display: flex;
+  padding: 10px;
+  border-radius: 5px;
+  justify-content: space-between;
+}
+
+.todo-card input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.todo-card h2 {
+  margin: 0;
+  cursor: pointer;
+}
+
+.todo-card button {
+  background-color: #ff6666;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+
+}
+
+.todo-card button:hover {
+  background-color: #ff4d4d;
+}
+

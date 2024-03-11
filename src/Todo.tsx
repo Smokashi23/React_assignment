@@ -1,38 +1,34 @@
 import React, { useEffect, useState } from "react";
 import "./Todo.css";
 import useFetchData from "./FetchData";
-import { error } from "console";
 
-interface TodoItem {
-  id: number;
-  todo: string;
-  completed: boolean;
-}
+import List from "./List";
+import AddTodo from "./AddTodo";
+import NavbarTodo from "./Nav";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ViewTodo from "./ViewTodo";
+import TodoItem from "./models/todoItem";
 
 const Todo = () => {
-  const [todo, setTodo] = useState<string>("");
   const [todolist, setTodolist] = useState<TodoItem[]>([]);
-  const { data, loading, error } = useFetchData("http://localhost:8000/data");
+  const { data, loading, error, refetchData } = useFetchData(
+    "http://localhost:8000/data"
+  );
   const [nextId, setID] = useState(0);
 
   useEffect(() => {
-    // console.log(data)
     setTodolist(data);
   }, [data]);
 
-  const addTodo = () => {
+  const addTodo = (todo: string, date: string) => {
+    refetchData(true);
     if (todo.trim() !== "") {
-      setTodolist([...todolist, { id: nextId, todo, completed: false }]);
-      setTodo("");
+      setTodolist([...todolist, { id: nextId, todo, date, completed: false }]);
       setID(nextId + 1);
     } else {
       alert("Enter task");
     }
   };
-
-  function handleInput(event: any) {
-    setTodo(event.target.value);
-  }
 
   const deleteTodo = (t: TodoItem) => {
     const newtodo = todolist.filter((item) => item.id !== t.id);
@@ -40,8 +36,13 @@ const Todo = () => {
   };
 
   const onCompletion = (t: TodoItem) => {
-    t.completed = !t.completed;
-    setTodolist([...todolist]);
+    const updatedList = todolist.map((item) => {
+      if (item.id === t.id) {
+        return { ...item, completed: !item.completed };
+      }
+      return item;
+    });
+    setTodolist(updatedList);
   };
   if (loading) {
     return (
@@ -60,42 +61,27 @@ const Todo = () => {
 
   return (
     <div className="todo-container">
-      {/* {loading && <div>loading...</div>} */}
-      {/* {error && <div>{error}</div>} */}
-      <h1>Todo app</h1>
-      <input type="text" value={todo} onChange={handleInput} />
-      <button onClick={addTodo}> Add Todo</button>
-      <div>
-        <ul>
-          {todolist.map((item: TodoItem) => (
-            <li key={item.id}>
-              <input
-                type="checkbox"
-                checked={item.completed}
-                onChange={() => onCompletion(item)}
-              />
-              {item.todo}
-              <button onClick={() => deleteTodo(item)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-        <div>
-          <h2>Completed Todos</h2>
-          <ul>
-            {todolist.map(
-              (item: TodoItem) =>
-                item.completed && <li key={item.id}>{item.todo}</li>
-            )}
-          </ul>
+      <BrowserRouter>
+        <NavbarTodo />
+        <div className="content">
+          <h1>Oraganise your day</h1>
+          <Routes>
+            <Route path="/addTodo" element={<AddTodo addTodo={addTodo} />} />
+
+            <Route path="/viewtodo/:id" element={<ViewTodo />} />
+            <Route
+              path="/"
+              element={
+                <List
+                  todolist={todolist}
+                  onCompletion={onCompletion}
+                  deleteTodo={deleteTodo}
+                />
+              }
+            />
+          </Routes>
         </div>
-        <h2>Uncompleted Todos</h2>
-        <ul>
-          {todolist.map(
-            (item: TodoItem) =>
-              !item.completed && <li key={item.id}>{item.todo}</li>
-          )}
-        </ul>
-      </div>
+      </BrowserRouter>
     </div>
   );
 };
