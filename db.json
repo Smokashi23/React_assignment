@@ -1,11 +1,6 @@
 {
   "data": [
     {
-      "id": "1649",
-      "todo": "sak",
-      "completed": false
-    },
-    {
       "id": "9568",
       "todo": "as",
       "completed": true
@@ -16,24 +11,9 @@
       "completed": true
     },
     {
-      "id": "86f0",
-      "todo": "df",
-      "completed": true
-    },
-    {
       "id": "1f51",
       "todo": "dvf",
       "completed": true
-    },
-    {
-      "id": "bf78",
-      "todo": "sakshi",
-      "completed": false
-    },
-    {
-      "id": "628e",
-      "todo": "xyz",
-      "completed": false
     },
     {
       "id": "20f5",
@@ -46,36 +26,27 @@
       "completed": false
     },
     {
-      "id": "4209",
-      "todo": "new1",
-      "completed": true
-    },
-    {
       "id": "a10e",
       "todo": "new2",
-      "completed": true
-    },
-    {
-      "id": "22c9",
-      "todo": "new4",
-      "completed": true
-    },
-    {
-      "id": "d39b",
-      "todo": "new32",
       "completed": false
     },
     {
-      "id": "03a6",
-      "todo": "sak",
-      "date": "2024-03-12",
-      "completed": false
-    },
-    {
-      "id": "f2fc",
-      "todo": "ias",
+      "id": "9667",
+      "todo": "Demo22",
       "date": "2024-03-13",
       "completed": true
+    },
+    {
+      "id": "4913",
+      "todo": "Suraj",
+      "date": "2024-03-14",
+      "completed": false
+    },
+    {
+      "id": "6c8d",
+      "todo": "tr",
+      "date": "2024-03-06",
+      "completed": false
     }
   ]
 }

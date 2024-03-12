@@ -1,9 +1,9 @@
 import React from "react";
 import "./App.css";
-import Todo from "./Todo";
-import FetchData from "./FetchData";
+import Todo from "./components/Todo";
+import FetchData from "./components/FetchData";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import List from "./List";
+import List from "./container/TodoContainer";
 
 function App() {
   return <Todo />;

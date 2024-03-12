@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import TodoItem from "./models/todoItem";
+import TodoItem from "../models/todoItem";
 
 // export default function useFetchData(){
 // //   const handledata=()=>{

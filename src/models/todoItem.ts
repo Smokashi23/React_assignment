@@ -1,7 +1,7 @@
-interface TodoItem {
+interface TodoComponent {
   id:number;
   todo: string;
   completed: boolean;
   date: string
 }
-export default TodoItem;
+export default TodoComponent;
