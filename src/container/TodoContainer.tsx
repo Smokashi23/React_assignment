@@ -2,7 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import TodoItem from "../components/TodoItems";
 import TodoComponent from "../models/todoItem";
-
+import SearchContainer from "./SearchContainer";
+import SortContainer from "./SortContainer";
+import Sort from "../components/Sort";
 
 interface ListProps {
   data: TodoComponent[];
@@ -11,6 +13,9 @@ interface ListProps {
 
 function TodoContainer({ data, refetchData }: ListProps) {
   const [todolist, setTodolist] = useState<TodoComponent[]>(data);
+  const [searchText, setSearchText] = useState("");
+  const [sortBy, setSortBy] = useState<string>("title");
+  const [sortOrder, setSortOrder] = useState<string>("asc");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,15 +74,75 @@ function TodoContainer({ data, refetchData }: ListProps) {
       .catch((err) => console.error("Error updating todo:", err));
   };
 
+  // const [filterTodos, setFilterTodos] = useState<TodoComponent[]>(todolist);
 
+  // function filterTodo() {
+  //   // console.log("filtered todo");
+
+  //   // const searchQuery = searchText.length
+  //   if (searchText) {
+  //     const newArr = todolist.filter((item) =>
+  //       item.todo.toLowerCase().includes(searchText.toLowerCase())
+  //     );
+  //     setFilterTodos(newArr);
+  //   } else {
+  //     console.log("In empty search");
+  //     setFilterTodos(todolist);
+  //   }
+  //   console.log(todolist);
+  //   // const filteredTodos = todolist.filter((item) =>
+  //   //   searchText === ""
+  //   //     ? item
+  //   //     : item.todo.toLowerCase().includes(searchText.toLowerCase())
+  //   // );
+  //   // console.log(filteredTodos);
+  //   // setTodolist(filteredTodos);
+  // }
+
+  // console.log("Search", searchText);
+
+  // useEffect(() )
+
+  const filterTodos = useMemo(
+    () =>
+      todolist.filter((item) =>
+        item.todo.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [searchText, todolist]
+  );
+  console.log("Filter", todolist);
+
+
+  const handleSort = (criteria: string) => {
+    if (criteria === sortBy) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(criteria);
+      setSortOrder("asc");
+    }
+  };
+
+
+  filterTodos.sort((a: TodoComponent, b: TodoComponent) => {
+    if (sortBy === "name") {
+      return sortOrder === "asc" ? a.todo.localeCompare(b.todo) : b.todo.localeCompare(a.todo);
+    } else if (sortBy === "date") {
+      return sortOrder === "asc" ? new Date(a.date).getTime() - new Date(b.date).getTime() : new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+    return 0;
+  });
+  
 
   return (
     <div>
+      <SearchContainer setSearch={setSearchText} filterTodo={() => {}} />
+      <SortContainer handleSort={handleSort} sortBy={""} sortOrder={""} />
       <div className="viewList">
         <div className="com">
           <h2>Completed Todos</h2>
+         
           <ul className="todo-list completed">
-            {todolist.map((item) => {
+            {filterTodos.map((item) => {
               return (
                 item.completed && (
                   <TodoItem
@@ -96,7 +161,7 @@ function TodoContainer({ data, refetchData }: ListProps) {
         <div className="incom">
           <h2>Incompleted Todos</h2>
           <ul className="todo-list incompleted">
-            {todolist.map((item) => {
+            {filterTodos.map((item) => {
               return (
                 !item.completed && (
                   <TodoItem
