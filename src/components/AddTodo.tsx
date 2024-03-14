@@ -1,15 +1,38 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import TodoItem from "../models/todoItem";
-import "../css_styles/AddTodo.css"
+import "../css_styles/AddTodo.css";
+import axios from "axios";
+import { useMutation } from "react-query";
+
 interface AProps {}
 
 function AddTodo(props: AProps) {
   const [todo, setTodo] = useState<string>("");
   const [date, setDate] = useState<string>("");
-  // const [todolist, setTodolist] = useState<TodoItem[]>([]);
-  const [nextId, setID] = useState(0);
   const navigate = useNavigate();
+
+  const addTodo = (todo: string, date: string) => {
+    if (todo.trim() !== "") {
+    } else {
+      alert("Enter task");
+    }
+  };
+
+  const { mutate: mutateAddTodo } = useMutation(
+    (payload: { todo: string; date: string; completed: boolean }) =>
+      axios.post("http://localhost:8000/data", payload),
+    {
+      onSuccess: () => {
+        addTodo(todo, date);
+        navigate("/");
+        alert("Data Added successfully");
+      },
+      onError: () => {
+        alert("error");
+      },
+    }
+  );
 
   const handleInput = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -22,32 +45,13 @@ function AddTodo(props: AProps) {
     }
   };
 
-  const addTodo = (todo: string, date: string) => {
-    if (todo.trim() !== "") {
-      // setTodolist([...todolist, { id: nextId, todo, date, completed: false }]);
-      // setID(nextId + 1);
-    } else {
-      alert("Enter task");
-    }
-  };
-
   const handleAddTodo = () => {
     if (todo && date) {
-      fetch("http://localhost:8000/data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          todo: todo,
-          date: date,
-          completed: false,
-        }),
-      })
-        .then((res) => {
-          addTodo(todo, date);
-          navigate("/");
-          alert("Data Added successfully");
-        })
-        .catch((err) => console.error("Error adding todo:", err));
+      mutateAddTodo({
+        todo,
+        date,
+        completed: false,
+      });
     } else {
       alert("Todo and date cannot be empty");
     }
@@ -78,4 +82,5 @@ function AddTodo(props: AProps) {
     </div>
   );
 }
-export default AddTodo
+export default AddTodo;
+
