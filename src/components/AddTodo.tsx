@@ -1,30 +1,23 @@
-import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import TodoItem from "../models/todoItem";
-import "../css_styles/AddTodo.css";
+import React from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import axios from "axios";
-import { useMutation } from "react-query";
+import { useMutation, MutationFunction } from "react-query";
+import { useNavigate } from "react-router-dom";
 
-interface AProps {}
+interface TodoData {
+  todo: string;
+  date: string;
+  completed: boolean;
+}
 
-function AddTodo(props: AProps) {
-  const [todo, setTodo] = useState<string>("");
-  const [date, setDate] = useState<string>("");
+const AddTodo = () => {
   const navigate = useNavigate();
 
-  const addTodo = (todo: string, date: string) => {
-    if (todo.trim() !== "") {
-    } else {
-      alert("Enter task");
-    }
-  };
-
-  const { mutate: mutateAddTodo } = useMutation(
-    (payload: { todo: string; date: string; completed: boolean }) =>
-      axios.post("http://localhost:8000/data", payload),
+  const { mutate: mutateAddTodo } = useMutation<void, Error, TodoData>(
+    (payload) => axios.post("http://localhost:8000/data", payload),
     {
       onSuccess: () => {
-        addTodo(todo, date);
         navigate("/");
         alert("Data Added successfully");
       },
@@ -34,53 +27,63 @@ function AddTodo(props: AProps) {
     }
   );
 
-  const handleInput = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    field: string
-  ) => {
-    if (field === "todo") {
-      setTodo(event.target.value);
-    } else if (field === "date") {
-      setDate(event.target.value);
-    }
-  };
-
-  const handleAddTodo = () => {
-    if (todo && date) {
-      mutateAddTodo({
-        todo,
-        date,
+  const formik = useFormik({
+    initialValues: {
+      todo: "",
+      date: "",
+    },
+    validationSchema: Yup.object({
+      todo: Yup.string().required("Todo is required"),
+      date: Yup.date()
+      .min(new Date(), "Date is Invalid")
+      .required("Date is required"),
+    }),
+    onSubmit: async (values, { resetForm }) => {
+      await mutateAddTodo({
+        todo: values.todo,
+        date: values.date,
         completed: false,
       });
-    } else {
-      alert("Todo and date cannot be empty");
-    }
-  };
+      resetForm();
+    },
+  });
 
   return (
     <div className="container">
-      <div>
-        <input
-          type="text"
-          placeholder="Enter Todo"
-          value={todo}
-          onChange={(e) => handleInput(e, "todo")}
-        />
-      </div>
-      <div className="date-input">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => handleInput(e, "date")}
-        />
-      </div>
-      <div className="button-container">
-        <button className="action-button" onClick={handleAddTodo}>
-          Add
-        </button>
-      </div>
+      <form onSubmit={formik.handleSubmit}>
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Todo"
+            name="todo"
+            value={formik.values.todo}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          {formik.touched.todo && formik.errors.todo ? (
+            <div className="error">{formik.errors.todo}</div>
+          ) : null}
+        </div>
+        <div className="date-input">
+          <input
+            type="date"
+            name="date"
+            value={formik.values.date}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          {formik.touched.date && formik.errors.date ? (
+            <div className="error">{formik.errors.date}</div>
+          ) : null}
+        </div>
+        <div className="button-container">
+          <button className="action-button" type="submit">
+            Add
+          </button>
+        </div>
+      </form>
     </div>
   );
-}
-export default AddTodo;
+};
 
+export default AddTodo;
