@@ -34,7 +34,9 @@ const AddTodo = () => {
     },
     validationSchema: Yup.object({
       todo: Yup.string().required("Todo is required"),
-      date: Yup.string().required("Date is required"),
+      date: Yup.date()
+      .min(new Date(), "Date is Invalid")
+      .required("Date is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
       await mutateAddTodo({
