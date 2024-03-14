@@ -1,22 +1,34 @@
+import { useMutation, QueryCache } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import TodoItem from "../components/TodoItems";
 import TodoComponent from "../models/todoItem";
 import SearchContainer from "./SearchContainer";
 import SortContainer from "./SortContainer";
-import Sort from "../components/Sort";
+import axios from "axios";
 
 interface ListProps {
   data: TodoComponent[];
   refetchData: Function;
+  goToPage: (page: number) => void;
+  currentPage: number;
 }
 
-function TodoContainer({ data, refetchData }: ListProps) {
+function TodoContainer({
+  data,
+  refetchData,
+  goToPage,
+  currentPage,
+}: ListProps) {
   const [todolist, setTodolist] = useState<TodoComponent[]>(data);
-  const [searchText, setSearchText] = useState("");
-  const [sortBy, setSortBy] = useState<string>("title");
+  const [searchText, setSearchText] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("name");
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const navigate = useNavigate();
+  // const [page, setPage] = useState<number>(1);
+  // const [limit, setLimit] = useState<number>(2);
+
+  const [totalPages, setTotalPages] = useState<number>(3);
 
   useEffect(() => {
     setTodolist(data);
@@ -26,92 +38,50 @@ function TodoContainer({ data, refetchData }: ListProps) {
     refetchData(true);
   }, []);
 
-  const deleteTodo = (item: TodoComponent) => {
-    fetch(`http://localhost:8000/data/${item.id}`, {
-      method: "DELETE",
-    })
-      .then(() => {
+  const deleteTodoMutation = useMutation(
+    (item: TodoComponent) =>
+      axios.delete(`http://localhost:8000/data/${item.id}`),
+    {
+      onSuccess: (data, item: TodoComponent) => {
         setTodolist((prevList) =>
           prevList.filter((todo) => todo.id !== item.id)
         );
         alert("Todo deleted successfully");
-      })
-      .catch((err) => console.error("Error deleting todo:", err));
-  };
-
-  const onCompletion = (item: TodoComponent) => {
-    fetch(`http://localhost:8000/data/${item.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ completed: !item.completed }),
-    })
-      .then(() => {
+      onError: (error, item: TodoComponent) => {
+        console.error("Error deleting todo:", error);
+      },
+    }
+  );
+
+  const patchTodoMutation = useMutation(
+    (item: TodoComponent) =>
+      axios
+        .patch(`http://localhost:8000/data/${item.id}`, {
+          completed: !item.completed,
+        })
+        .then((response) => response.data),
+    {
+      onSuccess: (updatedTodo: TodoComponent) => {
         setTodolist((prevList) =>
-          prevList.map((todo) => {
-            if (todo.id === item.id) {
-              return { ...todo, completed: !todo.completed };
-            }
-            return todo;
-          })
+          prevList.map((todo) =>
+            todo.id === updatedTodo.id ? updatedTodo : todo
+          )
         );
-      })
-      .catch((err) => console.error("Error updating todo:", err));
+      },
+      onError: (error) => {
+        console.error("Error updating todo:", error);
+      },
+    }
+  );
+
+  const handleDeleteTodo = (item: TodoComponent) => {
+    deleteTodoMutation.mutate(item);
   };
 
   const handleCheckboxChange = (item: TodoComponent) => {
-    fetch(`http://localhost:8000/data/${item.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ completed: !item.completed }),
-    })
-      .then(() => {
-        onCompletion(item);
-      })
-      .catch((err) => console.error("Error updating todo:", err));
+    patchTodoMutation.mutate(item);
   };
-
-  // const [filterTodos, setFilterTodos] = useState<TodoComponent[]>(todolist);
-
-  // function filterTodo() {
-  //   // console.log("filtered todo");
-
-  //   // const searchQuery = searchText.length
-  //   if (searchText) {
-  //     const newArr = todolist.filter((item) =>
-  //       item.todo.toLowerCase().includes(searchText.toLowerCase())
-  //     );
-  //     setFilterTodos(newArr);
-  //   } else {
-  //     console.log("In empty search");
-  //     setFilterTodos(todolist);
-  //   }
-  //   console.log(todolist);
-  //   // const filteredTodos = todolist.filter((item) =>
-  //   //   searchText === ""
-  //   //     ? item
-  //   //     : item.todo.toLowerCase().includes(searchText.toLowerCase())
-  //   // );
-  //   // console.log(filteredTodos);
-  //   // setTodolist(filteredTodos);
-  // }
-
-  // console.log("Search", searchText);
-
-  // useEffect(() )
-
-  const filterTodos = useMemo(
-    () =>
-      todolist.filter((item) =>
-        item.todo.toLowerCase().includes(searchText.toLowerCase())
-      ),
-    [searchText, todolist]
-  );
-  console.log("Filter", todolist);
-
 
   const handleSort = (criteria: string) => {
     if (criteria === sortBy) {
@@ -122,62 +92,87 @@ function TodoContainer({ data, refetchData }: ListProps) {
     }
   };
 
+  const filterTodos = useMemo(
+    () =>
+      todolist.filter((item: TodoComponent) =>
+        item.todo.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [searchText, todolist]
+  );
 
   filterTodos.sort((a: TodoComponent, b: TodoComponent) => {
     if (sortBy === "name") {
-      return sortOrder === "asc" ? a.todo.localeCompare(b.todo) : b.todo.localeCompare(a.todo);
+      return sortOrder === "asc"
+        ? a.todo.localeCompare(b.todo)
+        : b.todo.localeCompare(a.todo);
     } else if (sortBy === "date") {
-      return sortOrder === "asc" ? new Date(a.date).getTime() - new Date(b.date).getTime() : new Date(b.date).getTime() - new Date(a.date).getTime();
+      return sortOrder === "asc"
+        ? new Date(a.date).getTime() - new Date(b.date).getTime()
+        : new Date(b.date).getTime() - new Date(a.date).getTime();
     }
     return 0;
   });
-  
 
   return (
     <div>
       <SearchContainer setSearch={setSearchText} filterTodo={() => {}} />
-      <SortContainer handleSort={handleSort} sortBy={""} sortOrder={""} />
+      <SortContainer
+        handleSort={handleSort}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+      />
       <div className="viewList">
         <div className="com">
           <h2>Completed Todos</h2>
-         
           <ul className="todo-list completed">
-            {filterTodos.map((item) => {
-              return (
-                item.completed && (
-                  <TodoItem
-                    key={item.id}
-                    item={item}
-                    handleCheckboxChange={handleCheckboxChange}
-                    handleDeleteTodo={deleteTodo}
-                    navigate={navigate}
-                  />
-                )
-              );
-            })}
+            {filterTodos
+              .filter((item) => item.completed)
+              .map((item) => (
+                <TodoItem
+                  key={item.id}
+                  item={item}
+                  handleCheckboxChange={handleCheckboxChange}
+                  handleDeleteTodo={handleDeleteTodo}
+                  navigate={undefined}
+                />
+              ))}
           </ul>
         </div>
-
         <div className="incom">
           <h2>Incompleted Todos</h2>
           <ul className="todo-list incompleted">
-            {filterTodos.map((item) => {
-              return (
-                !item.completed && (
-                  <TodoItem
-                    key={item.id}
-                    item={item}
-                    handleCheckboxChange={handleCheckboxChange}
-                    handleDeleteTodo={deleteTodo}
-                    navigate={navigate}
-                  />
-                )
-              );
-            })}
+            {filterTodos
+              .filter((item) => !item.completed)
+              .map((item) => (
+                <TodoItem
+                  key={item.id}
+                  item={item}
+                  handleCheckboxChange={handleCheckboxChange}
+                  handleDeleteTodo={handleDeleteTodo}
+                  navigate={undefined}
+                />
+              ))}
           </ul>
         </div>
+      </div>
+      <div className="pagination">
+        <button
+          className="btn btn-primary mr-2"
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <button
+          className="btn btn-primary"
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
 }
+
 export default TodoContainer;

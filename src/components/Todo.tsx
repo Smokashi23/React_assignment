@@ -8,12 +8,16 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import ViewTodo from "./ViewTodo";
 import AddTodo from "./AddTodo";
 
-
 const Todo = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    console.log(setCurrentPage);
+  };
   const { data, loading, error, refetchData } = useFetchData(
-    "http://localhost:8000/data"
+    `http://localhost:8000/data?_page=${currentPage}&_limit=2`,
+    currentPage
   );
-  const [searchQuery, setSearchQuery] = useState("")
 
   if (loading) {
     return (
@@ -41,11 +45,22 @@ const Todo = () => {
           <Routes>
             <Route path="/addTodo" element={<AddTodo />} />
             <Route path="/viewtodo/:id" element={<ViewTodo />} />
-          
+
             <Route
               path="/"
               element={
-                <TodoContainer data={data} refetchData={refetchData} />
+                <div>
+                  {data ? (
+                    <TodoContainer
+                      data={data}
+                      refetchData={refetchData}
+                      goToPage={goToPage}
+                      currentPage={currentPage}
+                    />
+                  ) : (
+                    <div>No data available</div>
+                  )}
+                </div>
               }
             />
           </Routes>
@@ -55,4 +70,3 @@ const Todo = () => {
   );
 };
 export default Todo;
-

@@ -1,24 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 
 export default function ViewTodo() {
-  const [todo, setTodo] = useState<string>("");
   const params = useParams();
+  
+  const { data: todo, isLoading, isError } = useQuery(
+    ["todo", params.id],
+    async () => {
+      const res = await axios.get(`http://localhost:8000/data/${params.id}`);
+      return res.data.todo;
+    }
+  );
 
-  useEffect(() => {
-    console.log(todo);
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/data/${params.id}`).then(
-          (resp) => resp.json()
-        );
-        setTodo(res.todo);
-      } catch (error) {
-        console.error("Error fetching todo:", error);
-      }
-    };
-    fetchData();
-  }, [params.id]);
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching todo</div>;
 
   return (
     <div>
