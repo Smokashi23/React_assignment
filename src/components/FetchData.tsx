@@ -1,6 +1,5 @@
- import { useEffect, useState } from "react"
-import TodoItem from "./models/todoItem";
-
+import { useEffect, useState } from "react";
+import TodoItem from "../models/todoItem";
 
 // export default function useFetchData(){
 // //   const handledata=()=>{
@@ -42,23 +41,32 @@ import TodoItem from "./models/todoItem";
 
 // }
 
-export default function useFetchData(url:string){
-  const [data, setData] = useState <TodoItem[]>([]);
+export default function useFetchData(url: string) {
+  const [data, setData] = useState<TodoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refetch, setFetch] = useState(false);
 
-  useEffect(()=> {
+  const refetchData = (value: boolean) => {
+    setFetch(value);
+  };
 
-  setTimeout(()=>{
-    fetch(url)
-    .then((res)=> res.json())
-    .then((data)=>{setData(data);setLoading(false);setError(null)})
-    .catch((error:any)=>{setError(error.message)
-      setLoading(false)});
-  },1000)
-  },[]);
+  useEffect(() => {
+    setTimeout(() => {
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          setData(data);
+          setLoading(false);
+          setError(null);
+          refetchData(false);
+        })
+        .catch((error: any) => {
+          setError(error.message);
+          setLoading(false);
+        });
+    }, 1000);
+  }, [refetch]);
 
-  return {data,loading,error}
+  return { data, loading, error, refetchData };
 }
-
-
