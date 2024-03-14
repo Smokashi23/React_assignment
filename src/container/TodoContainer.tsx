@@ -1,37 +1,66 @@
 import { useMutation, QueryCache } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import TodoItem from "../components/TodoItems";
 import TodoComponent from "../models/todoItem";
 import SearchContainer from "./SearchContainer";
 import SortContainer from "./SortContainer";
 import axios from "axios";
 
+
 interface ListProps {
   data: TodoComponent[];
-  refetchData: Function;
+  refetchData: Function;  
   goToPage: (page: number) => void;
   currentPage: number;
 }
+interface State {
+  todolist: TodoComponent[];
+  searchText: string;
+  sortBy: string;
+  sortOrder: string;
+  totalPages: number;
+}
 
+const initialState: State = {
+  todolist: [],
+  searchText: "",
+  sortBy: "name",
+  sortOrder: "asc",
+  totalPages: 3,
+};
+
+
+function reducer(state: State, action: any): State {
+  switch (action.type) {
+    case "SET_TODOLIST":
+      return { ...state, todolist: action.payload };
+    case "SET_SEARCH_TEXT":
+      return { ...state, searchText: action.payload };
+    case "SET_SORT_BY":
+      return { ...state, sortBy: action.payload, sortOrder: "asc" };
+    case "SET_SORT_ORDER":
+      return { ...state, sortOrder: action.payload };
+    case "SET_TOTAL_PAGES":
+      return { ...state, totalPages: action.payload };
+    default:
+      return state;
+  }
+}
 function TodoContainer({
   data,
   refetchData,
   goToPage,
   currentPage,
 }: ListProps) {
-  const [todolist, setTodolist] = useState<TodoComponent[]>(data);
-  const [searchText, setSearchText] = useState<string>("");
-  const [sortBy, setSortBy] = useState<string>("name");
-  const [sortOrder, setSortOrder] = useState<string>("asc");
-  const navigate = useNavigate();
-  // const [page, setPage] = useState<number>(1);
-  // const [limit, setLimit] = useState<number>(2);
 
-  const [totalPages, setTotalPages] = useState<number>(3);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { todolist, searchText, sortBy, sortOrder, totalPages } = state;
+  const navigate = useNavigate();
+
 
   useEffect(() => {
-    setTodolist(data);
+    dispatch({ type: "SET_TODOLIST", payload: data });
   }, [data]);
 
   useEffect(() => {
@@ -43,9 +72,10 @@ function TodoContainer({
       axios.delete(`http://localhost:8000/data/${item.id}`),
     {
       onSuccess: (data, item: TodoComponent) => {
-        setTodolist((prevList) =>
-          prevList.filter((todo) => todo.id !== item.id)
-        );
+        dispatch({
+          type: "SET_TODOLIST",
+          payload: todolist.filter((todo) => todo.id !== item.id),
+        });
         alert("Todo deleted successfully");
       },
       onError: (error, item: TodoComponent) => {
@@ -63,11 +93,12 @@ function TodoContainer({
         .then((response) => response.data),
     {
       onSuccess: (updatedTodo: TodoComponent) => {
-        setTodolist((prevList) =>
-          prevList.map((todo) =>
+        dispatch({
+          type: "SET_TODOLIST",
+          payload: todolist.map((todo) =>
             todo.id === updatedTodo.id ? updatedTodo : todo
-          )
-        );
+          ),
+        });
       },
       onError: (error) => {
         console.error("Error updating todo:", error);
@@ -85,10 +116,10 @@ function TodoContainer({
 
   const handleSort = (criteria: string) => {
     if (criteria === sortBy) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      dispatch({ type: "SET_SORT_ORDER", payload: sortOrder === "asc" ? "desc" : "asc" });
     } else {
-      setSortBy(criteria);
-      setSortOrder("asc");
+      dispatch({ type: "SET_SORT_BY", payload: criteria });
+      dispatch({ type: "SET_SORT_ORDER", payload: "asc" });
     }
   };
 
@@ -115,7 +146,10 @@ function TodoContainer({
 
   return (
     <div>
-      <SearchContainer setSearch={setSearchText} filterTodo={() => {}} />
+      <SearchContainer 
+         setSearch={(text) => dispatch({ type: "SET_SEARCH_TEXT", payload: text })}
+         filterTodo={() => { }}
+      />
       <SortContainer
         handleSort={handleSort}
         sortBy={sortBy}
