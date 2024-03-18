@@ -1,22 +1,10 @@
 {
   "data": [
     {
-      "id": "beb2",
-      "todo": "new23",
-      "date": "2024-03-06",
-      "completed": false
-    },
-    {
-      "id": "fe6a",
-      "todo": "saw",
-      "date": "2024-02-07",
-      "completed": false
-    },
-    {
       "id": "db92",
       "todo": "zzzz",
       "date": "2024-03-15",
-      "completed": false
+      "completed": true
     },
     {
       "id": "7e41",
@@ -28,13 +16,13 @@
       "id": "1ec3",
       "todo": "wcevew",
       "date": "2024-04-01",
-      "completed": false
+      "completed": true
     },
     {
       "id": "6f22",
       "todo": "pagination",
       "date": "2024-03-13",
-      "completed": false
+      "completed": true
     },
     {
       "todo": "fwf",
@@ -45,7 +33,7 @@
     {
       "todo": "dd",
       "date": "2024-02-27",
-      "completed": false,
+      "completed": true,
       "id": "dNBu9cv"
     },
     {

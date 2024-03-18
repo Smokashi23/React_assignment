@@ -6,11 +6,11 @@ import TodoComponent from "../models/todoItem";
 import SearchContainer from "./SearchContainer";
 import SortContainer from "./SortContainer";
 import axios from "axios";
-
+import { TODO_ACTIONS, setSearchAction, setSortByAction, setSortOrderAction, setTodoAction } from "../action/Action";
 
 interface ListProps {
   data: TodoComponent[];
-  refetchData: Function;  
+  refetchData: Function;
   goToPage: (page: number) => void;
   currentPage: number;
 }
@@ -30,18 +30,17 @@ const initialState: State = {
   totalPages: 3,
 };
 
-
 function reducer(state: State, action: any): State {
   switch (action.type) {
-    case "SET_TODOLIST":
+    case TODO_ACTIONS.SET_TODO:
       return { ...state, todolist: action.payload };
-    case "SET_SEARCH_TEXT":
+    case TODO_ACTIONS.SET_SEARCH:
       return { ...state, searchText: action.payload };
-    case "SET_SORT_BY":
+    case TODO_ACTIONS.SET_SORT_BY:
       return { ...state, sortBy: action.payload, sortOrder: "asc" };
-    case "SET_SORT_ORDER":
+    case TODO_ACTIONS.SET_SORT_ORDER:
       return { ...state, sortOrder: action.payload };
-    case "SET_TOTAL_PAGES":
+    case TODO_ACTIONS.SET_TOTAL_PAGES:
       return { ...state, totalPages: action.payload };
     default:
       return state;
@@ -53,14 +52,12 @@ function TodoContainer({
   goToPage,
   currentPage,
 }: ListProps) {
-
   const [state, dispatch] = useReducer(reducer, initialState);
   const { todolist, searchText, sortBy, sortOrder, totalPages } = state;
   const navigate = useNavigate();
 
-
   useEffect(() => {
-    dispatch({ type: "SET_TODOLIST", payload: data });
+    dispatch(setTodoAction(data));
   }, [data]);
 
   useEffect(() => {
@@ -72,10 +69,11 @@ function TodoContainer({
       axios.delete(`http://localhost:8000/data/${item.id}`),
     {
       onSuccess: (data, item: TodoComponent) => {
-        dispatch({
-          type: "SET_TODOLIST",
-          payload: todolist.filter((todo) => todo.id !== item.id),
-        });
+        // dispatch({
+        //   type: "Set_Todo",
+        //   payload: todolist.filter((todo) => todo.id !== item.id),
+        // });
+          dispatch(setTodoAction([]))
         alert("Todo deleted successfully");
       },
       onError: (error, item: TodoComponent) => {
@@ -92,13 +90,9 @@ function TodoContainer({
         })
         .then((response) => response.data),
     {
-      onSuccess: (updatedTodo: TodoComponent) => {
-        dispatch({
-          type: "SET_TODOLIST",
-          payload: todolist.map((todo) =>
-            todo.id === updatedTodo.id ? updatedTodo : todo
-          ),
-        });
+      onSuccess: (updatedTodo: TodoComponent[]) => {
+         dispatch(setTodoAction([]));
+         refetchData()
       },
       onError: (error) => {
         console.error("Error updating todo:", error);
@@ -116,10 +110,10 @@ function TodoContainer({
 
   const handleSort = (criteria: string) => {
     if (criteria === sortBy) {
-      dispatch({ type: "SET_SORT_ORDER", payload: sortOrder === "asc" ? "desc" : "asc" });
+      dispatch(setSortOrderAction(sortOrder === "asc" ? "desc" : "asc"));
     } else {
-      dispatch({ type: "SET_SORT_BY", payload: criteria });
-      dispatch({ type: "SET_SORT_ORDER", payload: "asc" });
+      dispatch(setSortByAction(criteria));
+      dispatch(setSortOrderAction("asc"));
     }
   };
 
@@ -144,11 +138,12 @@ function TodoContainer({
     return 0;
   });
 
+  
   return (
     <div>
-      <SearchContainer 
-         setSearch={(text) => dispatch({ type: "SET_SEARCH_TEXT", payload: text })}
-         filterTodo={() => { }}
+      <SearchContainer
+        setSearch={(text:string) => dispatch(setSearchAction(text))}
+        filterTodo={() => {}}
       />
       <SortContainer
         handleSort={handleSort}

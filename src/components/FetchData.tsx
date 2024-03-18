@@ -45,7 +45,8 @@ export default function useFetchData(url: string, page: number) {
       return response.json();
     }
   );
-
+    console.log(data);
+    
   return { data, loading: isLoading, error: isError, refetchData: refetch };
 }
 

@@ -28,7 +28,7 @@ import React, { useState } from "react";
 import Search from "../components/Search";
 
 interface SearchContainerProps {
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  setSearch: (text:string)=>void;
   filterTodo:Function
 }
 
