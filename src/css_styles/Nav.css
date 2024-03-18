@@ -1,0 +1,38 @@
+.navbar {
+  background-color: orange;
+  padding: 20px;
+  width: 100%;
+}
+
+.navbar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex; 
+  justify-content: flex-end; 
+}
+
+.navbar ul li {
+  margin-left: 10px; 
+}
+
+.navbar ul li:first-child {
+  margin-left: auto; 
+}
+
+.navbar ul li:last-child {
+  margin-right: 30px; 
+}
+
+.navbar ul li a {
+  color: white;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 8px 16px; 
+  transition: background-color 0.3s, box-shadow 0.3s; 
+}
+
+.navbar ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.1); 
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}

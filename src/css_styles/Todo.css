@@ -1,0 +1,149 @@
+.todo-container {
+  list-style-type: none;
+  text-align: center;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.todoList {
+  display: flex;
+  flex-direction: column;
+}
+
+.todoList li {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  margin-bottom: 5px; 
+}
+
+.todoList li input[type="checkbox"] {
+  margin-right: 5px; 
+}
+
+.todoList li button.action-button {
+  margin-left: 5px; 
+}
+
+.viewList li{
+  list-style-type: none;
+
+}
+
+
+.com{
+ 
+  width: calc(50vw - 50px);
+  margin:20px;
+  border:1px solid grey;
+  min-height: 60vh;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px; 
+
+}
+
+.incom{
+  width: calc(50vw - 50px);
+  margin:20px;
+  border:1px solid grey;
+  min-height: 60vh;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px; 
+}
+
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.action-button {
+  background-color: #ff6666;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+
+}
+
+.action-button:hover {
+  background-color: #ff4d4d;
+}
+
+
+
+.viewList {
+  display: flex;
+ 
+}
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todo-list.completed {
+  margin-right: 20px; 
+}
+
+.todo-list.incompleted {
+  margin-left: 20px; 
+}
+
+.todo-item {
+  margin-bottom: 10px; 
+}
+
+.todo-task {
+  margin-bottom: 5px; /* Adjust as needed */
+  text-align: center; /* Center align the task */
+}
+
+.todo-date {
+  margin-top: 5px; /* Add some space between task and date */
+  text-align: center; /* Center align the date */
+  font-size: inherit; /* Inherit font size from parent */
+  font-family: inherit; /* Inherit font family from parent */
+}
+
+
+.todo-card {
+  border: 1px solid #ccc;
+  width:50%;
+  margin:auto;
+  display: flex;
+  padding: 10px;
+  border-radius: 5px;
+  justify-content: space-between;
+}
+
+.todo-card input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.todo-card h2 {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* .dropdown-item {
+  background-color: #775ef6;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  
+}
+
+.dropdown-item :hover {
+  background-color: #751ff6;
+} */
